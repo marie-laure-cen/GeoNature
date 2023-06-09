@@ -69,6 +69,7 @@ class SyntheseQuery:
         id_digitiser_column="id_digitiser",
         with_generic_table=False,
         query_joins=None,
+        geom_column=None,
     ):
         self.query = query
 
@@ -77,6 +78,7 @@ class SyntheseQuery:
         self.model = model
         self._already_joined_table = []
         self.query_joins = query_joins
+        self.geom_column = geom_column if geom_column is not None else model.the_geom_4326
 
         if with_generic_table:
             model_temp = model.columns
@@ -419,12 +421,12 @@ class SyntheseQuery:
                 if "radius" in feature["properties"]:
                     radius = feature["properties"]["radius"]
                     geo_filter = func.ST_DWithin(
-                        func.ST_GeogFromWKB(self.model.the_geom_4326),
+                        func.ST_GeogFromWKB(self.geom_column),
                         func.ST_GeogFromWKB(geom_wkb),
                         radius,
                     )
                 else:
-                    geo_filter = self.model.the_geom_4326.ST_Intersects(geom_wkb)
+                    geo_filter = self.geom_column.ST_Intersects(geom_wkb)
                 geo_filters.append(geo_filter)
             self.query = self.query.where(or_(*geo_filters))
             self.filters.pop("geoIntersection")
