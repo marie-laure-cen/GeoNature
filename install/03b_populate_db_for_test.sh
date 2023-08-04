@@ -14,3 +14,4 @@ geonature sensitivity add-referential \
     --zipfile RefSensibiliteV16_20230203.zip \
     --csvfile RefSensibiliteV16_20230203/RefSensibilite_16.csv \
     --encoding=iso-8859-15
+geonature sensitivity refresh-rules-cache
