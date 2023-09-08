@@ -188,7 +188,6 @@ class TestSynthese:
 
         r = self.client.get(url)
         assert r.status_code == 200
-        print(r.json)
         validate_json(instance=r.json, schema=schema)
 
         # test on synonymy and taxref attrs
