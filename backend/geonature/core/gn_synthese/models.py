@@ -600,6 +600,12 @@ class VSyntheseForWebApp(DB.Model):
         TReport, primaryjoin=(TReport.id_synthese == foreign(id_synthese)), uselist=True
     )
 
+    cor_observers = DB.relationship(
+        User,
+        secondary=cor_observer_synthese,
+        primaryjoin=id_synthese == cor_observer_synthese.c.id_synthese,
+    )
+
 
 # Non utilisé - laissé pour exemple d'une sérialisation ordonnée
 def synthese_export_serialization(cls):

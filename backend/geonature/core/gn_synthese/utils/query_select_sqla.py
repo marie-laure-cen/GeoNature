@@ -138,11 +138,6 @@ class SyntheseQuery:
         """
         Return a where clause for the given permissions set
         """
-        subquery_observers = (
-            select([CorObserverSynthese.id_synthese])
-            .select_from(CorObserverSynthese)
-            .where(CorObserverSynthese.id_role == user.id_role)
-        )
         datasets_by_scope = {}  # to avoid fetching datasets several time for same scope
         permissions_filters = []
         non_diffusion = None
@@ -172,7 +167,7 @@ class SyntheseQuery:
                     ]
                 datasets = datasets_by_scope[perm.scope_value]
                 scope_filters = [
-                    self.model_id_syn_col.in_(subquery_observers),  # user is observer
+                    self.model.cor_observers.any(id_role=user.id_role),  # user is observer
                     self.model_id_digitiser_column == user.id_role,  # user id digitizer
                     self.model_id_dataset_column.in_(
                         datasets
