@@ -390,7 +390,7 @@ Gestion des droits
 Accès à GeoNature et CRUVED
 ```````````````````````````
 
-Les comptes des utilisateurs, leur mot de passe, email, groupes et leur accès à l'application GeoNature sont gérés de manière centralisée dans l'application UsersHub. Pour qu'un rôle (utilisateur ou groupe) ait accès à GeoNature, il faut lui attribuer un profil de "Lecteur" dans l'application GeoNature, grâce à l'application UsersHub.
+Les comptes des utilisateurs, leur mot de passe, email, groupes et leur accès à l'application GeoNature sont gérés de manière centralisée dans l'application UsersHub. Pour qu'un rôle (utilisateur ou groupe) ait accès à GeoNature, il faut lui attribuer un profil de "Lecteur" dans l'application GeoNature, grâce à l'application UsersHub. Cette action vient modifier la table ``utilisateurs.cor_role_app_profil`` de la base de données en liant un id_role (identifiant du groupe ou de l'utilisateur dans utilisateurs.t_roles) à un id_application (1 pour GeoNature) et à une id_profil (1 pour lecteur).
 
 La gestion des droits (permissions) des rôles, spécifique à GeoNature, est ensuite gérée dans un schéma (``gn_permissions``) depuis le module ADMIN de GeoNature. Voir https://docs.geonature.fr/user-manual.html#gestion-des-permissions.
 
@@ -416,7 +416,7 @@ Exemple :
 - Utilisateur 1 peut effectuer l'action "DELETE" sur "SES DONNEES"
 - Utilisateur Admin peut effectuer l'action "UPDATE" sur "TOUTES LES DONNEES" (sans filtre d'appartenance)
 
-Ces permissions sont attribuées module par module, et éventuellement sur des objets de certains modules.
+Ces permissions sont attribuées module par module, et éventuellement sur des objets de certains modules. Elles se retrouvent notamment dans la table ``gn_permissions.t_permissions``.
 
 Cas particulier de l'action "C"
 ```````````````````````````````
@@ -441,7 +441,7 @@ Une commande dédiée permet d'ajouter toutes les permissions sur tous les modul
 Récapitulatif
 `````````````
 
-- Dans GeoNature on peut attribuer à un role des actions possibles dans un module, sur lesquels on peut ajouter des filtres (définis dans la table ``gn_permissions.t_permissions``).
+- Dans GeoNature on peut attribuer à un role des actions possibles dans un module, sur lesquels on peut ajouter des filtres (définis dans la table ``gn_permissions.t_permissions``) une fois le profil "Lecteur" créé dans UserHubs (ou en base dans la table ``utilisateurs.cor_role_app_profil``).
 - 6 actions sont possibles dans GeoNature : Create / Read / Update / Validate / Export / Delete (aka CRUVED).
 - Différents types de filtre existent. Le plus courant est le filtre d'appartenance (portée) : 2 filtres d'appartenance sont attribuables à des actions : Mes données / Les données de mon organisme. La synthèse dispose aussi d'un filtre de sensibilité.
 - Des fonctions PostgreSQL ont aussi été intégrées pour faciliter la récupération de ces informations (``gn_permissions.cruved_for_user_in_module``, ``gn_permissions.does_user_have_scope_permission``, ...)
@@ -453,7 +453,8 @@ A noter que toutes les actions et tous les filtres n'ont pas été implémentée
 Nomenclatures
 """""""""""""
 
-- Toutes les valeurs des listes déroulantes sont gérées dans une table générique ``ref_nomenclatures.t_nomenclatures``
+- Toutes les valeurs des listes déroulantes sont gérées dans une table générique ``ref_nomenclatures.t_nomenclatures`, 
+- La table ``ref_nomenclatures.bib_nomenclatures_types`` permet de connaître à quel type de nomenclature correspond chaque élément de la table précédente.
 - Elles s'appuient sur les nomenclatures du SINP (http://standards-sinp.mnhn.fr/nomenclature/) qui peuvent être désactivées ou completées
 - Chaque nomenclature est associée à un type, et une vue par type de nomenclature a été ajoutée pour simplifier leur usage
 - Ces nomenclatures sont gérées dans un sous-module pour pouvoir les réutiliser (ainsi que leur mécanisme) dans d'autres applications : https://github.com/PnX-SI/Nomenclature-api-module/
@@ -471,8 +472,9 @@ Métadonnées
 """""""""""
 
 - Elles sont gérées dans le schéma ``gn_meta`` basé sur le standard Métadonnées du SINP (http://standards-sinp.mnhn.fr/category/standards/metadonnees/)
-- Elles permettent de gérer des jeux de données, des cadres d'acquisition, des acteurs (propriétaire, financeur, producteur...) et des protocoles
-- Elles peuvent être administrées dans le module Métadonnées de GeoNature
+- Elles permettent de gérer des jeux de données, des cadres d'acquisition, des acteurs (propriétaire, financeur, producteur...) et des protocoles.
+- Elles peuvent être administrées dans le module Métadonnées de GeoNature.
+- Les acteurs (propriétaire, financeur...) sont quant à eux stockés dans la table ``utilisateurs.bib_organismes`` et peuvent être gérés dans UsersHub.
 
 Données SIG
 """""""""""
